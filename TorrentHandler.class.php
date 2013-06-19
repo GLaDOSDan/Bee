@@ -15,9 +15,13 @@ class TorrentHandler {
 	
 	}
 
-
 	public function is_torrent(){
 		return $this->TorrentBencoder->is_torrent($this->data);
+	}
+
+
+	public function name(){
+		return $this->TorrentBencoder->name();
 	}
 
 }

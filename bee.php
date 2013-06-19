@@ -30,3 +30,5 @@ $Torrent = new TorrentHandler($path);
 if (!$Torrent->is_torrent()){
 	die("Unable to load torrent - is not torrent file\n");
 }
+
+echo "Loaded torrent: " . $Torrent->name() . "\n";
