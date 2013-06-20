@@ -342,7 +342,7 @@ class TorrentBencoder {
 	 * @param string data or file path to decode
 	 * @return array decoded torrent data
 	 */
-	static protected function decode ( $string ) {
+	static public function decode ( $string ) {
 		return (array) self::decode_data( $string );
 	}
 

@@ -20,11 +20,20 @@ class TorrentHandler {
 	}
 
 
+	public function size(){
+		return $this->TorrentBencoder->size();
+	}
+
 	public function name(){
 		return $this->TorrentBencoder->name();
 	}
 
 	public function announce(){
+
+		if (!empty($GLOBALS['ANNOUNCE_URL_OVERRIDE'])){
+			return $GLOBALS['ANNOUNCE_URL_OVERRIDE'];
+		}
+
 		return $this->TorrentBencoder->announce();
 	}
 

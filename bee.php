@@ -1,5 +1,24 @@
 <?php
 
+/*
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+Created by GLaDOSDan <gladosdan@gmail.com> - June 2013
+
+http://github.com/GLaDOSDan/Bee
+
+*/
+
+define('PEER_ID', '-BEE_DEBUG-');
+$GLOBALS['ANNOUNCE_URL_OVERRIDE'] = ''; //Leave blank if you want to use the announce url from the .torrent file
+
 echo "\n";
 echo "                 \\     /\n";
 echo "             \\    o ^ o    /\n";
@@ -35,6 +54,7 @@ if (!$Torrent->is_torrent()){
 
 echo "Loaded torrent:\n";
 echo "	Filename: " . pathinfo($path, PATHINFO_BASENAME) . "\n";
+echo "	Torrent name: " . $Torrent->name() . "\n";
 echo "	Announce: " . $Torrent->announce() . "\n";
 echo "	Infohash: " . strtoupper($Torrent->infohash()) . "\n";
 
@@ -42,14 +62,17 @@ echo "	Infohash: " . strtoupper($Torrent->infohash()) . "\n";
 // Initialize command handler
 
 $Command = new CommandHandler;
-$Command->TorrentAnnounce->set_announce_url($Torrent->announce());
-$Command->TorrentAnnounce->set_infohash($Torrent->infohash());
+$Command->announce_url = $Torrent->announce();
+$Command->infohash = $Torrent->infohash();
+$Command->size = $Torrent->size();
+
+$Command->loadTorrentAnnounce();
 
 echo "> ";
 
 while (FALSE !== ($input = fgets(STDIN))) {
 
-	echo "\n" . $Command->input($input) . "\n\n";
+	echo "\n" . $Command->input($input) . "\n";
 	
 	echo "> ";
 }
