@@ -28,7 +28,10 @@ License
 
 Please see the LICENSE file for more details.
 
+Useful Resources
+==========
 
+https://wiki.theory.org/BitTorrentSpecification#Tracker_HTTP.2FHTTPS_Protocol
 
 Credits
 ======
