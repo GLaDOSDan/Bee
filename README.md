@@ -18,3 +18,10 @@ License
 ======
 
 Please see the LICENSE file for more details.
+
+
+
+Credits
+======
+
+Thanks to Adrien Gibrat for the Torrent Bencoding class, which can be found at https://github.com/adriengibrat/torrent-rw
