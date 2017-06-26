@@ -1,6 +1,8 @@
 <?php
 
-class TorrentAnnounce {
+namespace GLaDOSDan\Bee\Torrent;
+
+class Announce {
 
 
 	private $announce;
@@ -54,7 +56,7 @@ class TorrentAnnounce {
 		$this->set('peer_id', PEER_ID);
 		$this->set('compact', '1');
 
-		
+
 		// All is good to send the request to the tracker
 
 		$request = $this->prepare_request();
@@ -70,7 +72,7 @@ class TorrentAnnounce {
 		curl_close($ch);
 
 
-		$TorrentBencoder = new TorrentBencoder;
+		$TorrentBencoder = new Bencoder;
 
 		ob_start();
 		var_dump($TorrentBencoder->decode($response));

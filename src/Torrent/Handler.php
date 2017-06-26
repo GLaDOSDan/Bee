@@ -1,6 +1,8 @@
 <?php
 
-class TorrentHandler {
+namespace GLaDOSDan\Bee\Torrent;
+
+class Handler {
 
 	public $path;
 	public $data;
@@ -11,7 +13,7 @@ class TorrentHandler {
 		$this->path = $path;
 		$this->data = file_get_contents($this->path);
 
-		$this->TorrentBencoder = new TorrentBencoder($this->data);
+		$this->TorrentBencoder = new Bencoder($this->data);
 
 	}
 

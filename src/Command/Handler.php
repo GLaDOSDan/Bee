@@ -1,7 +1,12 @@
 <?php
 
-class CommandHandler {
+namespace GLaDOSDan\Bee\Command;
 
+use GLaDOSDan\Bee\Torrent;
+
+class Handler {
+
+    /** @var Torrent\Announce */
 	public $TorrentAnnounce;
 
 	public $announce_url;
@@ -10,7 +15,7 @@ class CommandHandler {
 
 	public function loadTorrentAnnounce(){
 		unset($this->TorrentAnnounce);
-		$this->TorrentAnnounce = new TorrentAnnounce;
+		$this->TorrentAnnounce = new Torrent\Announce;
 		$this->TorrentAnnounce->set_announce_url($this->announce_url);
 		$this->TorrentAnnounce->set_infohash($this->infohash);
 		$this->TorrentAnnounce->set_size($this->size);

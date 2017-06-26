@@ -16,6 +16,11 @@ http://github.com/GLaDOSDan/Bee
 
 */
 
+require_once '../vendor/autoload.php';
+
+use GLaDOSDan\Bee\Torrent;
+use GLaDOSDan\Bee\Command;
+
 define('PEER_ID', '-BEE_DEBUG-');
 $GLOBALS['ANNOUNCE_URL_OVERRIDE'] = ''; //Leave blank if you want to use the announce url from the .torrent file
 
@@ -34,19 +39,13 @@ echo "                  (%%%)\n";
 
 echo "\n\nWelcome to Bee v0.1\n\n";
 
-
-require_once('TorrentBencoder.class.php');
-require_once('TorrentHandler.class.php');
-require_once('TorrentAnnounce.class.php');
-require_once('CommandHandler.class.php');
-
 $path = $argv[1];
 
 if (!file_exists($path)){
 	die("Unable to load torrent file - file does not exist\n");
 }
 
-$Torrent = new TorrentHandler($path);
+$Torrent = new Torrent\Handler($path);
 
 if (!$Torrent->is_torrent()){
 	die("Unable to load torrent - is not torrent file\n");
@@ -61,7 +60,7 @@ echo "	Infohash: " . strtoupper($Torrent->infohash()) . "\n";
 
 // Initialize command handler
 
-$Command = new CommandHandler;
+$Command = new Command\Handler;
 $Command->announce_url = $Torrent->announce();
 $Command->infohash = $Torrent->infohash();
 $Command->size = $Torrent->size();
@@ -73,6 +72,6 @@ echo "> ";
 while (FALSE !== ($input = fgets(STDIN))) {
 
 	echo "\n" . $Command->input($input) . "\n";
-	
+
 	echo "> ";
 }
