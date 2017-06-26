@@ -2,45 +2,50 @@
 
 namespace GLaDOSDan\Bee\Torrent;
 
-class Handler {
+class Handler
+{
 
-	public $path;
-	public $data;
+    public $path;
+    public $data;
 
-	private $TorrentBencoder;
-	
-	function __construct($path){
-		$this->path = $path;
-		$this->data = file_get_contents($this->path);
+    private $TorrentBencoder;
 
-		$this->TorrentBencoder = new Bencoder($this->data);
+    function __construct($path)
+    {
+        $this->path = $path;
+        $this->data = file_get_contents($this->path);
 
-	}
+        $this->TorrentBencoder = new Bencoder($this->data);
+    }
 
-	public function is_torrent(){
-		return $this->TorrentBencoder->is_torrent($this->data);
-	}
+    public function is_torrent()
+    {
+        return $this->TorrentBencoder->is_torrent($this->data);
+    }
 
 
-	public function size(){
-		return $this->TorrentBencoder->size();
-	}
+    public function size()
+    {
+        return $this->TorrentBencoder->size();
+    }
 
-	public function name(){
-		return $this->TorrentBencoder->name();
-	}
+    public function name()
+    {
+        return $this->TorrentBencoder->name();
+    }
 
-	public function announce(){
+    public function announce()
+    {
+        if (!empty($GLOBALS['ANNOUNCE_URL_OVERRIDE'])) {
+            return $GLOBALS['ANNOUNCE_URL_OVERRIDE'];
+        }
 
-		if (!empty($GLOBALS['ANNOUNCE_URL_OVERRIDE'])){
-			return $GLOBALS['ANNOUNCE_URL_OVERRIDE'];
-		}
+        return $this->TorrentBencoder->announce();
+    }
 
-		return $this->TorrentBencoder->announce();
-	}
-
-	public function infohash(){
-		return $this->TorrentBencoder->hash_info();
-	}
+    public function infohash()
+    {
+        return $this->TorrentBencoder->hash_info();
+    }
 
 }

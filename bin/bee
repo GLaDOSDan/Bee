@@ -19,8 +19,8 @@ http://github.com/GLaDOSDan/Bee
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use GLaDOSDan\Bee\Torrent;
 use GLaDOSDan\Bee\Command;
+use GLaDOSDan\Bee\Torrent;
 
 define('PEER_ID', '-BEE_DEBUG-');
 $GLOBALS['ANNOUNCE_URL_OVERRIDE'] = ''; //Leave blank if you want to use the announce url from the .torrent file
@@ -46,14 +46,14 @@ if (!isset($argv[1])) {
 
 $path = $argv[1];
 
-if (!file_exists($path)){
-	die("Unable to load torrent file - file does not exist\n");
+if (!file_exists($path)) {
+    die("Unable to load torrent file - file does not exist\n");
 }
 
 $Torrent = new Torrent\Handler($path);
 
-if (!$Torrent->is_torrent()){
-	die("Unable to load torrent - is not torrent file\n");
+if (!$Torrent->is_torrent()) {
+    die("Unable to load torrent - is not torrent file\n");
 }
 
 echo "Loaded torrent:\n";
@@ -74,9 +74,9 @@ $Command->loadTorrentAnnounce();
 
 echo "> ";
 
-while (FALSE !== ($input = fgets(STDIN))) {
+while (false !== ($input = fgets(STDIN))) {
 
-	echo "\n" . $Command->input($input) . "\n";
+    echo "\n" . $Command->input($input) . "\n";
 
-	echo "> ";
+    echo "> ";
 }
