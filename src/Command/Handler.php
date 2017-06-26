@@ -36,9 +36,8 @@ class Handler
 
     }
 
-    public function help($args)
+    public function help()
     {
-
         $return[] = 'help - This help command';
         $return[] = 'download - Set the amount downloaded, accepts `all` as an alias for the size of the torrent';
         $return[] = 'upload - Set the amount uploaded';
