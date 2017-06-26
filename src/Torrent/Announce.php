@@ -6,7 +6,7 @@ class Announce
 {
     public $objects;
     private $announce;
-    private $infohash;
+    private $info_hash;
     private $size;
     private $request_params;
 
@@ -15,9 +15,9 @@ class Announce
         $this->announce = $announce_url;
     }
 
-    public function set_infohash($infohash)
+    public function set_infohash($info_hash)
     {
-        $this->infohash = $infohash;
+        $this->info_hash = $info_hash;
     }
 
     public function set_size($size)
@@ -27,7 +27,7 @@ class Announce
 
     public function commit()
     {
-        $this->set('info_hash', pack('H*', $this->infohash));
+        $this->set('info_hash', pack('H*', $this->info_hash));
 
         if (!isset($this->objects['left'])) {
             $this->set('left', $this->size - @$this->objects['downloaded']);

@@ -67,7 +67,7 @@ echo "	Infohash: " . strtoupper($Torrent->infohash()) . "\n";
 
 $Command = new Command\Handler;
 $Command->announce_url = $Torrent->announce();
-$Command->infohash = $Torrent->infohash();
+$Command->info_hash = $Torrent->infohash();
 $Command->size = $Torrent->size();
 
 $Command->loadTorrentAnnounce();

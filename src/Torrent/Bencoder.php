@@ -72,6 +72,12 @@ class Bencoder
      */
     const timeout = 30;
 
+
+    /**
+     * @var array
+     */
+    public $info;
+
     /**
      * @var array List of error occured
      */
@@ -94,10 +100,12 @@ class Bencoder
         foreach ($meta as $key => $value) {
             $this->{$key} = $value;
         }
+
+        return $this;
     }
 
     /** Decode torrent data or file
-     * @param string data or file path to decode
+     * @param string $string data or file path to decode
      * @return array decoded torrent data
      */
     static public function decode($string)
@@ -106,8 +114,8 @@ class Bencoder
     }
 
     /** Decode torrent data
-     * @param string data to decode
-     * @return array decoded torrent data
+     * @param string $data data to decode
+     * @return array|string decoded torrent data
      */
     static private function decode_data(& $data)
     {
@@ -127,7 +135,7 @@ class Bencoder
     }
 
     /** Helper to return the first char of encoded data
-     * @param string encoded data
+     * @param string $data encoded data
      * @return string|boolean first char of encoded data or false if empty data
      */
     static private function char($data)
@@ -140,7 +148,7 @@ class Bencoder
     /**** Getters and setters ****/
 
     /** Decode torrent integer
-     * @param string data to decode
+     * @param string $data data to decode
      * @return integer decoded integer
      */
     static private function decode_integer(& $data)
@@ -148,16 +156,16 @@ class Bencoder
         $start = 0;
         $end = strpos($data, 'e');
         if ($end === 0) {
-            self::set_error(new Exception('Empty integer'));
+            self::set_error(new \Exception('Empty integer'));
         }
         if (self::char($data) == '-') {
             $start++;
         }
         if (substr($data, $start, 1) == '0' && ($start != 0 || $end > $start + 1)) {
-            self::set_error(new Exception('Leading zero in integer'));
+            self::set_error(new \Exception('Leading zero in integer'));
         }
         if (!ctype_digit(substr($data, $start, $end))) {
-            self::set_error(new Exception('Non-digit characters in integer'));
+            self::set_error(new \Exception('Non-digit characters in integer'));
         }
         $integer = substr($data, 0, $end);
         $data = substr($data, $end + 1);
@@ -165,9 +173,9 @@ class Bencoder
     }
 
     /** Add an error to errors stack
-     * @param Exception error to add
-     * @param boolean return error message or not (optional, default to false)
-     * @return boolean|string return false or error message if requested
+     * @param \Exception $exception error to add
+     * @param boolean $message return error message or not (optional, default to false)
+     * @return boolean|string|array return false or error message if requested
      */
     static protected function set_error($exception, $message = false)
     {
@@ -175,7 +183,7 @@ class Bencoder
     }
 
     /** Decode torrent list
-     * @param string data to decode
+     * @param string $data data to decode
      * @return array decoded list
      */
     static private function decode_list(& $data)
@@ -183,7 +191,7 @@ class Bencoder
         $list = array();
         while (($char = self::char($data)) != 'e') {
             if ($char === false) {
-                return self::set_error(new Exception('Unterminated list'));
+                return self::set_error(new \Exception('Unterminated list'));
             }
             $list[] = self::decode_data($data);
         }
@@ -192,7 +200,7 @@ class Bencoder
     }
 
     /** Decode torrent dictionary
-     * @param string data to decode
+     * @param string $data data to decode
      * @return array decoded dictionary
      */
     static private function decode_dictionary(& $data)
@@ -201,17 +209,17 @@ class Bencoder
         $previous = null;
         while (($char = self::char($data)) != 'e') {
             if ($char === false) {
-                return self::set_error(new Exception('Unterminated dictionary'));
+                return self::set_error(new \Exception('Unterminated dictionary'));
             }
             if (!ctype_digit($char)) {
-                return self::set_error(new Exception('Invalid dictionary key'));
+                return self::set_error(new \Exception('Invalid dictionary key'));
             }
             $key = self::decode_string($data);
             if (isset($dictionary[$key])) {
-                return self::set_error(new Exception('Duplicate dictionary key'));
+                return self::set_error(new \Exception('Duplicate dictionary key'));
             }
             if ($key < $previous) {
-                return self::set_error(new Exception('Missorted dictionary key'));
+                return self::set_error(new \Exception('Missorted dictionary key'));
             }
             $dictionary[$key] = self::decode_data($data);
             $previous = $key;
@@ -221,20 +229,20 @@ class Bencoder
     }
 
     /** Decode torrent string
-     * @param string data to decode
+     * @param string $data data to decode
      * @return string decoded string
      */
     static private function decode_string(& $data)
     {
         if (self::char($data) === '0' && substr($data, 1, 1) != ':') {
-            self::set_error(new Exception('Invalid string length, leading zero'));
+            self::set_error(new \Exception('Invalid string length, leading zero'));
         }
         if (!$colon = @strpos($data, ':')) {
-            return self::set_error(new Exception('Invalid string length, colon not found'));
+            return self::set_error(new \Exception('Invalid string length, colon not found'));
         }
         $length = intval(substr($data, 0, $colon));
         if ($length + $colon + 1 > strlen($data)) {
-            return self::set_error(new Exception('Invalid string, input too short for string length'));
+            return self::set_error(new \Exception('Invalid string, input too short for string length'));
         }
         $string = substr($data, $colon + 1, $length);
         $data = substr($data, $colon + $length + 1);
@@ -244,16 +252,16 @@ class Bencoder
     /**** Analyze BitTorrent ****/
 
     /** Helper to open file to read (even bigger than 2Gb, linux only)
-     * @param string file path
-     * @param integer|double file size (optional)
-     * @return ressource|boolean file handle or false if error
+     * @param string $file file path
+     * @param integer|double $size file size (optional)
+     * @return resource|boolean file handle or false if error
      */
     static public function fopen($file, $size = null)
     {
         if ((is_null($size) ? self::filesize($file) : $size) <= 2 * pow(1024, 3)) {
             return fopen($file, 'r');
         } elseif (PHP_OS != 'Linux') {
-            return self::set_error(new Exception('File size is greater than 2GB. This is only supported under Linux'));
+            return self::set_error(new \Exception('File size is greater than 2GB. This is only supported under Linux'));
         } elseif (!is_readable($file)) {
             return false;
         } else {
@@ -261,9 +269,9 @@ class Bencoder
         }
     }
 
-    /** Helper to return filesize (even bigger than 2Gb -linux only- and distant files size)
-     * @param string file path
-     * @return double|boolean filesize or false if error
+    /** Helper to return file size (even bigger than 2Gb -linux only- and distant files size)
+     * @param string $file file path
+     * @return double|boolean file size or false if error
      */
     static public function filesize($file)
     {
@@ -274,10 +282,12 @@ class Bencoder
                 return (int)preg_replace($pattern, '$1', reset($content_length));
             }
         }
+
+        return 0;
     }
 
-    /** Helper to scan directories files and sub directories recursivly
-     * @param string directory path
+    /** Helper to scan directories files and sub directories recursively
+     * @param string $dir directory path
      * @return array directory content list
      */
     static public function scandir($dir)
@@ -296,7 +306,7 @@ class Bencoder
     }
 
     /** Helper to check if url exists
-     * @param string url to check
+     * @param string $url url to check
      * @return boolean does the url exist or not
      */
     static public function url_exists($url)
@@ -307,7 +317,7 @@ class Bencoder
     }
 
     /** Helper to check if a file is a torrent
-     * @param string file location
+     * @param string $file file location
      * @return boolean is the file a torrent or not
      */
     static public function is_torrent($file)
@@ -318,11 +328,11 @@ class Bencoder
     /**** Save and Send ****/
 
     /** Helper to get (distant) file content
-     * @param string file location
-     * @param float http timeout (optional, default to self::timeout 30s)
-     * @param integer starting offset (optional, default to null)
-     * @param integer content length (optional, default to null)
-     * @return string|boolean file content or false if error
+     * @param string $file file location
+     * @param integer|float $timeout starting offset (optional, default to null)
+     * @param integer $offset content length (optional, default to null)
+     * @param int|null $length
+     * @return bool|string file content or false if error
      */
     static public function file_get_contents($file, $timeout = self::timeout, $offset = null, $length = null)
     {
@@ -335,7 +345,7 @@ class Bencoder
                 @file_get_contents($file, false, $context, $offset) :
                 @file_get_contents($file, false, $context);
         } elseif (!function_exists('curl_init')) {
-            return self::set_error(new Exception('Install CURL or enable "allow_url_fopen"'));
+            return self::set_error(new \Exception('Install CURL or enable "allow_url_fopen"'));
         }
         $handle = curl_init($file);
         if ($timeout) {
@@ -355,7 +365,7 @@ class Bencoder
     }
 
     /** Flatten announces list
-     * @param array announces list
+     * @param array $announces announces list
      * @return array flattened annonces list
      */
     static public function untier($announces)
@@ -380,7 +390,7 @@ class Bencoder
     }
 
     /** Encode torrent data
-     * @param mixed data to encode
+     * @param mixed $mixed data to encode
      * @return string torrent encoded data
      */
     static public function encode($mixed)
@@ -391,15 +401,18 @@ class Bencoder
                 return self::encode_integer($mixed);
             case 'object':
                 $mixed = get_object_vars($mixed);
+                break;
             case 'array':
                 return self::encode_array($mixed);
             default:
-                return self::encode_string((string)$mixed);
+                break;
         }
+
+        return self::encode_string((string)$mixed);
     }
 
     /** Encode torrent integer
-     * @param integer integer to encode
+     * @param int $integer integer to encode
      * @return string encoded integer
      */
     static private function encode_integer($integer)
@@ -408,7 +421,7 @@ class Bencoder
     }
 
     /** Encode torrent dictionary or list
-     * @param array array to encode
+     * @param array $array array to encode
      * @return string encoded dictionary or list
      */
     static private function encode_array($array)
@@ -431,7 +444,7 @@ class Bencoder
     /**** Decode BitTorrent ****/
 
     /** Helper to test if an array is a list
-     * @param array array to test
+     * @param array $array array to test
      * @return boolean is the array a list or not
      */
     static protected function is_list($array)
@@ -445,7 +458,7 @@ class Bencoder
     }
 
     /** Encode torrent string
-     * @param string string to encode
+     * @param string $string string to encode
      * @return string encoded string
      */
     static private function encode_string($string)
@@ -504,11 +517,13 @@ class Bencoder
             return $this->announce = (string)$announce;
         }
         unset($this->announce);
+
+        return null;
     }
 
     /** Set generation date
-     * @param any param
-     * @return any param
+     * @param * any param
+     * @return * any param
      */
     protected function touch($void = null)
     {
@@ -520,7 +535,7 @@ class Bencoder
 
     /** Build announce list
      * @param string|array announce url / list
-     * @param string|array announce url / list to add (optionnal)
+     * @param string|array announce url / list to add (optional)
      * @return array announce list (array of arrays)
      */
     static protected function announce_list($announce, $merge = array())
@@ -529,8 +544,8 @@ class Bencoder
     }
 
     /** Get the first announce url in a list
-     * @param array announce list (array of arrays if tiered trackers)
-     * @return string first announce url
+     * @param array $announce announce list (array of arrays if tiered trackers)
+     * @return string|array first announce url
      */
     static protected function first_announce($announce)
     {
@@ -628,8 +643,8 @@ class Bencoder
     /**** Public Helpers ****/
 
     /** Helper to build file path
-     * @param array file path
-     * @param string base folder
+     * @param array $path file path
+     * @param string $folder base folder
      * @return string real file path
      */
     static protected function path($path, $folder)
@@ -639,9 +654,9 @@ class Bencoder
     }
 
     /** Helper to format size in bytes to human readable
-     * @param integer size in bytes
-     * @param integer precision after coma
-     * @return string formated size in appropriate unit
+     * @param integer $size size in bytes
+     * @param integer $precision precision after coma
+     * @return string formatted size in appropriate unit
      */
     static public function format($size, $precision = 2)
     {
@@ -718,9 +733,9 @@ class Bencoder
     }
 
     /** Build pieces depending on piece length from a file handler
-     * @param ressource file handle
-     * @param integer piece length
-     * @param boolean is last piece
+     * @param resource $handle file handle
+     * @param integer $piece_length piece length
+     * @param boolean $last is last piece
      * @return string pieces
      */
     private function pieces($handle, $piece_length, $last = true)
@@ -734,7 +749,7 @@ class Bencoder
             if (($length = strlen($piece .= fread($handle, $length))) == $piece_length) {
                 $pieces .= self::pack($piece);
             } elseif (($length = $piece_length - $length) < 0) {
-                return self::set_error(new Exception('Invalid piece length!'));
+                return self::set_error(new \Exception('Invalid piece length!'));
             }
         }
         fclose($handle);
@@ -742,7 +757,7 @@ class Bencoder
     }
 
     /** Helper to pack data hash
-     * @param string data
+     * @param string $data data
      * @return string packed data hash
      */
     static protected function pack(& $data)
