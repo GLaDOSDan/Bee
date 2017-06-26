@@ -46,6 +46,12 @@ if (!isset($argv[1])) {
 
 $path = $argv[1];
 
+if (trim(strtolower($path)) == 'help') {
+    $CommandHandler = new GLaDOSDan\Bee\Command\Handler();
+    echo $CommandHandler->help();
+    die();
+}
+
 if (!file_exists($path)) {
     die("Unable to load torrent file - file does not exist\n");
 }
