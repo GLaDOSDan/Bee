@@ -40,6 +40,10 @@ echo "                  (%%%)\n";
 
 echo "\n\nWelcome to Bee v0.1\n\n";
 
+if (!isset($argv[1])) {
+    die("No file specified.\n");
+}
+
 $path = $argv[1];
 
 if (!file_exists($path)){
