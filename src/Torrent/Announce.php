@@ -4,12 +4,11 @@ namespace GLaDOSDan\Bee\Torrent;
 
 class Announce
 {
+    public $objects;
     private $announce;
     private $infohash;
     private $size;
     private $request_params;
-
-    public $objects;
 
     public function set_announce_url($announce_url)
     {
@@ -24,23 +23,6 @@ class Announce
     public function set_size($size)
     {
         $this->size = $size;
-    }
-
-
-    public function set($key, $value)
-    {
-        $this->objects[$key] = $value;
-    }
-
-    private function prepare_request()
-    {
-        $this->request_params = array();
-
-        foreach ($this->objects as $key => $value) {
-            $this->request_params[] = $key . '=' . urlencode($value);
-        }
-
-        return $this->announce . '?' . implode('&', $this->request_params);
     }
 
     public function commit()
@@ -81,6 +63,22 @@ class Announce
         unset($TorrentBencoder);
 
         return $return;
+    }
+
+    public function set($key, $value)
+    {
+        $this->objects[$key] = $value;
+    }
+
+    private function prepare_request()
+    {
+        $this->request_params = array();
+
+        foreach ($this->objects as $key => $value) {
+            $this->request_params[] = $key . '=' . urlencode($value);
+        }
+
+        return $this->announce . '?' . implode('&', $this->request_params);
     }
 
 }

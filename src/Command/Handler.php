@@ -12,20 +12,6 @@ class Handler
     public $infohash;
     public $size;
 
-    public function loadTorrentAnnounce()
-    {
-        unset($this->TorrentAnnounce);
-        $this->TorrentAnnounce = new Torrent\Announce;
-        $this->TorrentAnnounce->set_announce_url($this->announce_url);
-        $this->TorrentAnnounce->set_infohash($this->infohash);
-        $this->TorrentAnnounce->set_size($this->size);
-
-        $this->TorrentAnnounce->set('info_hash', pack('H*', $this->infohash));
-        $this->TorrentAnnounce->set('port', '1337');
-        $this->TorrentAnnounce->set('peer_id', PEER_ID);
-        $this->TorrentAnnounce->set('compact', '1');
-    }
-
     public function input($input)
     {
         $input = trim($input, "\n");
@@ -41,7 +27,6 @@ class Handler
         }
 
     }
-
 
     public function help($args)
     {
@@ -100,6 +85,23 @@ class Handler
         return $this->get();
     }
 
+    public function get($args = null)
+    {
+        // Returns current arguments to be committed
+
+        $list = array();
+
+        foreach ($this->TorrentAnnounce->objects as $k => $v) {
+            if ($k == 'info_hash') {
+                $v = urlencode($v);
+            }
+            $list[] = $k . ' => ' . $v;
+        }
+
+        return implode("\n", $list);
+
+    }
+
     public function upload($args)
     {
 
@@ -146,23 +148,6 @@ class Handler
 
     }
 
-    public function get($args = null)
-    {
-        // Returns current arguments to be committed
-
-        $list = array();
-
-        foreach ($this->TorrentAnnounce->objects as $k => $v) {
-            if ($k == 'info_hash') {
-                $v = urlencode($v);
-            }
-            $list[] = $k . ' => ' . $v;
-        }
-
-        return implode("\n", $list);
-
-    }
-
     public function commit($args = null)
     {
 
@@ -171,6 +156,20 @@ class Handler
 
         return $return;
 
+    }
+
+    public function loadTorrentAnnounce()
+    {
+        unset($this->TorrentAnnounce);
+        $this->TorrentAnnounce = new Torrent\Announce;
+        $this->TorrentAnnounce->set_announce_url($this->announce_url);
+        $this->TorrentAnnounce->set_infohash($this->infohash);
+        $this->TorrentAnnounce->set_size($this->size);
+
+        $this->TorrentAnnounce->set('info_hash', pack('H*', $this->infohash));
+        $this->TorrentAnnounce->set('port', '1337');
+        $this->TorrentAnnounce->set('peer_id', PEER_ID);
+        $this->TorrentAnnounce->set('compact', '1');
     }
 
 
