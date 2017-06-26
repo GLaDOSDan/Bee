@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 /*
@@ -16,7 +17,7 @@ http://github.com/GLaDOSDan/Bee
 
 */
 
-require_once '../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use GLaDOSDan\Bee\Torrent;
 use GLaDOSDan\Bee\Command;
