@@ -1,39 +1,34 @@
-Bee
-===
+# Bee
 
 Bee is a torrent tracker announce generator created for use by torrent tracker administrators to debug their tracker.
 
-Requirements
-===========
+## Requirements
 
-- PHP 
-
+- PHP
 - PHP-CLI
-
 - libcurl
 
 
-Usage
-====
+## Usage
 
 Bee has a fairly easy to understand command line interface, invoke it like so:
 
-`php bee.php /path/to/torrent_file.torrent`
+On Linux/Mac:  
+`bin/bee /path/to/torrent_file.torrent`
+
+On Windows:  
+`php bin/bee /path/to/torrent_file.torrent`
 
 Use `help` for a list of commands.
 
-
-License
-======
+## License
 
 Please see the LICENSE file for more details.
 
-Useful Resources
-==========
+## Useful Resources
 
 https://wiki.theory.org/BitTorrentSpecification#Tracker_HTTP.2FHTTPS_Protocol
 
-Credits
-======
+## Credits
 
 Thanks to Adrien Gibrat for the Torrent Bencoding class, which can be found at https://github.com/adriengibrat/torrent-rw
